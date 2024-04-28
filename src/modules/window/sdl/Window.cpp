@@ -589,8 +589,29 @@ bool Window::setWindow(int width, int height, WindowSettings *settings)
 	}
 
 	Uint32 sdlflags = 0;
+
+#if defined(LOVE_WINDOWS) && !defined(LOVE_WINDOWS_UWP)
+
 #if SDL_VERSION_ATLEAST(3, 0, 0)
-	sdlflags |= SDL_WINDOW_TRANSPARENT;
+	HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+#else
+	SDL_SysWMinfo wminfo = {};
+	SDL_VERSION(&wminfo.version);
+	HWND hwnd = null;
+	if (SDL_GetWindowWMInfo(window, &wminfo))
+		hwnd = wminfo.info.win.window;
+#endif
+	if (hwnd != null) {
+		DWM_BLURBEHIND bb = {0};
+		bb.dwFlags = DWM_BB_ENABLE;
+		bb.fEnable = true;
+		bb.hRgnBlur = NULL;
+		DwmEnableBlurBehindWindow(hWnd, &bb);
+	}
+#endif
+
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	//sdlflags |= SDL_WINDOW_TRANSPARENT;
 	const SDL_DisplayMode *fsmode = nullptr;
 #endif
 
