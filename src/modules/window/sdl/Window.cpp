@@ -597,11 +597,11 @@ bool Window::setWindow(int width, int height, WindowSettings *settings)
 #else
 	SDL_SysWMinfo wminfo = {};
 	SDL_VERSION(&wminfo.version);
-	HWND hwnd = null;
+	HWND hwnd = NULL;
 	if (SDL_GetWindowWMInfo(window, &wminfo))
 		hwnd = wminfo.info.win.window;
 #endif
-	if (hwnd != null) {
+	if (hwnd != NULL) {
 		DWM_BLURBEHIND bb = {0};
 		bb.dwFlags = DWM_BB_ENABLE;
 		bb.fEnable = true;
