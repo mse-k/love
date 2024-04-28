@@ -606,7 +606,7 @@ bool Window::setWindow(int width, int height, WindowSettings *settings)
 		bb.dwFlags = DWM_BB_ENABLE;
 		bb.fEnable = true;
 		bb.hRgnBlur = NULL;
-		DwmEnableBlurBehindWindow(hWnd, &bb);
+		DwmEnableBlurBehindWindow(hwnd, &bb);
 	}
 #endif
 
