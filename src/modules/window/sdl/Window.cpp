@@ -590,6 +590,7 @@ bool Window::setWindow(int width, int height, WindowSettings *settings)
 
 	Uint32 sdlflags = 0;
 #if SDL_VERSION_ATLEAST(3, 0, 0)
+	sdlflags |= SDL_WINDOW_TRANSPARENT;
 	const SDL_DisplayMode *fsmode = nullptr;
 #endif
 
