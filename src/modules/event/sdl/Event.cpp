@@ -171,17 +171,22 @@ Event::~Event()
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 }
 
-int Event::filterEvent(void *trash, SDL_Event * event)
+int Event::filterEvent(SDL_Event * event)
+{
+	Message *msg = convert(*event);
+	if (msg)
+	{
+		push(msg);
+		msg->release();
+	}
+}
+
+static int Event::filterEventStatic(void *me, SDL_Event * event)
 {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED)
 	{
 		//IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs
-		Message *msg = convert(*event);
-		if (msg)
-		{
-			push(msg);
-			msg->release();
-		}
+		me->filterEvent(event);
 		//return 0 if you don't want to handle this event twice
 		return 0;
 	}
@@ -194,7 +199,7 @@ void Event::pump()
 {
 	exceptionIfInRenderPass("love.event.pump");
 
-	SDL_SetEventFilter(Event::filterEvent, NULL);
+	SDL_SetEventFilter(Event::filterEventStatic, this);
 
 	SDL_Event e;
 
