@@ -45,7 +45,8 @@ public:
 	Event();
 	virtual ~Event();
 
-	int filterEvent(void *trash, SDL_Event * event);
+	int filterEvent(SDL_Event * event);
+	static int filterEventStatic(void *me, SDL_Event * event);
 	/**
 	 * Pumps the event queue. This function gathers all the pending input information
 	 * from devices and places it on the event queue. Normally not needed if you poll
