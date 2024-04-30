@@ -179,6 +179,7 @@ void Event::filterEvent(SDL_Event * event)
 		push(msg);
 		msg->release();
 	}
+	throw love::Exception("hi chat are we resizinating");
 }
 
 static int filterEventStatic(void *me, SDL_Event * event)
