@@ -171,7 +171,7 @@ Event::~Event()
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 }
 
-int filterEvent(void *trash, SDL_Event * event)
+int Event::filterEvent(void *trash, SDL_Event * event)
 {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED)
 	{
@@ -194,7 +194,7 @@ void Event::pump()
 {
 	exceptionIfInRenderPass("love.event.pump");
 
-	SDL_SetEventFilter(filterEvent, NULL)
+	SDL_SetEventFilter(Event::filterEvent, NULL);
 
 	SDL_Event e;
 
