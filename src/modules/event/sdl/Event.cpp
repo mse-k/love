@@ -173,18 +173,19 @@ Event::~Event()
 
 void Event::filterEvent(SDL_Event * event)
 {
+	return; //clearly cant go wrong here
 	Message *msg = convert(*event);
 	if (msg)
 	{
 		push(msg);
 		msg->release();
 	}
-	throw love::Exception("hi chat are we resizinating");
+	//throw love::Exception("hi chat are we resizinating");
 }
 
 static int filterEventStatic(void *me, SDL_Event * event)
 {
-	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED)
+	if (event->type == SDL_WINDOWEVENT /*&& event->window.event == SDL_WINDOWEVENT_RESIZED*/)
 	{
 		//IMPORTANT: Might be called from a different thread, see SDL_SetEventFilter docs
 		((Event*)me)->filterEvent(event);
