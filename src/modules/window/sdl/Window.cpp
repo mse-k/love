@@ -1716,6 +1716,7 @@ void Window::setWind(void *nwindow, void *nglcontext)
 	window = (SDL_Window *)nwindow;
 	glcontext = (SDL_GLContext *)nglcontext;
 	open = window != nullptr;
+	graphics->unSetMode();
 }
 
 SDL_MessageBoxFlags Window::convertMessageBoxType(MessageBoxType type) const
