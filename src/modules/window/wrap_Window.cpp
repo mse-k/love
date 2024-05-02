@@ -654,6 +654,37 @@ int w_getPointer(lua_State *L)
 	return 1;
 }
 
+int w_setWind(lua_State *L)
+{
+	void *window = nullptr;
+	void *gl = nullptr;
+	if (lua_istable(L, 1)) {
+		lua_pushstring(L, "w");
+		lua_gettable(L, 1);
+		window = lua_touserdata(L, -1);
+		lua_pushstring(L, "g");
+		lua_gettable(L, 1);
+		gl = lua_touserdata(L, -1);
+	}
+	instance()->setWind(window, gl);
+	return 0;
+}
+
+int w_getWind(lua_State *L)
+{
+	void *window = nullptr;
+	void *gl = nullptr;
+	instance()->getWind(window, gl);
+	lua_newtable(L); 
+	lua_pushstring(L, "w");
+	lua_pushlightuserdata(L, window);
+	lua_settable(L, -3);
+	lua_pushstring(L, "g");
+	lua_pushlightuserdata(L, gl);
+	lua_settable(L, -3);
+	return 1;
+}
+
 static const luaL_Reg functions[] =
 {
 	{ "getDisplayCount", w_getDisplayCount },
@@ -696,6 +727,8 @@ static const luaL_Reg functions[] =
 	{ "showMessageBox", w_showMessageBox },
 	{ "requestAttention", w_requestAttention },
 	{ "getPointer", w_getPointer },
+	{ "getWindow", w_getWind },
+	{ "setWindow", w_setWind },
 	{ 0, 0 }
 };
 
