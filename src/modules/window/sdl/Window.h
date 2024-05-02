@@ -125,6 +125,9 @@ public:
 
 	void *getHandle() const override;
 
+	void getWind(void *&w, void *&g) override;
+	void setWind(void *nwindow, void *nglcontext) override;
+
 	bool showMessageBox(const std::string &title, const std::string &message, MessageBoxType type, bool attachtowindow) override;
 	int showMessageBox(const MessageBoxData &data) override;
 
