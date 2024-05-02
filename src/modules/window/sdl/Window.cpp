@@ -1705,13 +1705,13 @@ void *Window::getHandle() const
 	return window;
 }
 
-void Window::getWind(void *&w, void *&g) const
+void Window::getWind(void *&w, void *&g)
 {
 	w = window;
 	g = glcontext;
 }
 
-void Window::setWind(void *nwindow, void *nglcontext) const
+void Window::setWind(void *nwindow, void *nglcontext)
 {
 	window = nwindow;
 	glcontext = nglcontext;
