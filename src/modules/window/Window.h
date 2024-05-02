@@ -216,6 +216,9 @@ public:
 
 	virtual void *getHandle() const = 0;
 
+	virtual void getWind(void *&w, void *&g) = 0;
+	virtual void setWind(void *nwindow, void *nglcontext) = 0;
+
 	virtual bool showMessageBox(const std::string &title, const std::string &message, MessageBoxType type, bool attachtowindow) = 0;
 	virtual int showMessageBox(const MessageBoxData &data) = 0;
 
