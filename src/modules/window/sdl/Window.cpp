@@ -116,6 +116,24 @@ Window::Window()
 
 Window::~Window()
 {
+	if (graphics.get())
+	{
+		graphics->unSetMode();
+	}
+
+	if (glcontext)
+	{
+		SDL_GL_DeleteContext(glcontext);
+		glcontext = nullptr;
+	}
+
+#ifdef LOVE_GRAPHICS_METAL
+	if (metalView)
+	{
+		SDL_Metal_DestroyView(metalView);
+		metalView = nullptr;
+	}
+#endif
 	close(false);
 	graphics.set(nullptr);
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
@@ -325,7 +343,7 @@ bool Window::createWindowAndContext(int x, int y, int w, int h, Uint32 windowfla
 
 	const auto create = [&](const ContextAttribs *attribs) -> bool
 	{
-		if (glcontext)
+		/*if (glcontext)
 		{
 			SDL_GL_DeleteContext(glcontext);
 			glcontext = nullptr;
@@ -337,7 +355,7 @@ bool Window::createWindowAndContext(int x, int y, int w, int h, Uint32 windowfla
 			SDL_Metal_DestroyView(metalView);
 			metalView = nullptr;
 		}
-#endif
+#endif*/
 
 		if (window)
 		{
@@ -371,24 +389,25 @@ bool Window::createWindowAndContext(int x, int y, int w, int h, Uint32 windowfla
 #ifdef LOVE_MACOS
 			love::macos::setWindowSRGBColorSpace(window);
 #endif
+			if (!glcontext) {
+				glcontext = SDL_GL_CreateContext(window);
 
-			glcontext = SDL_GL_CreateContext(window);
+				if (!glcontext)
+					contexterror = std::string(SDL_GetError());
 
-			if (!glcontext)
-				contexterror = std::string(SDL_GetError());
+				// Make sure the context's version is at least what we requested.
+				if (glcontext && !checkGLVersion(*attribs, glversion))
+				{
+					SDL_GL_DeleteContext(glcontext);
+					glcontext = nullptr;
+				}
 
-			// Make sure the context's version is at least what we requested.
-			if (glcontext && !checkGLVersion(*attribs, glversion))
-			{
-				SDL_GL_DeleteContext(glcontext);
-				glcontext = nullptr;
-			}
-
-			if (!glcontext)
-			{
-				SDL_DestroyWindow(window);
-				window = nullptr;
-				return false;
+				if (!glcontext)
+				{
+					SDL_DestroyWindow(window);
+					window = nullptr;
+					return false;
+				}
 			}
 		}
 
@@ -475,7 +494,25 @@ bool Window::createWindowAndContext(int x, int y, int w, int h, Uint32 windowfla
 			showMessageBox(title, message, MESSAGEBOX_ERROR, false);
 			displayedWindowError = true;
 		}
+		
+		if (graphics.get())
+		{
+			graphics->unSetMode();
+		}
 
+		if (glcontext)
+		{
+			SDL_GL_DeleteContext(glcontext);
+			glcontext = nullptr;
+		}
+
+#ifdef LOVE_GRAPHICS_METAL
+		if (metalView)
+		{
+			SDL_Metal_DestroyView(metalView);
+			metalView = nullptr;
+		}
+#endif
 		close();
 		return false;
 	}
@@ -958,28 +995,6 @@ void Window::close()
 
 void Window::close(bool allowExceptions)
 {
-	if (graphics.get())
-	{
-		if (allowExceptions && graphics->isRenderTargetActive())
-			throw love::Exception("love.window.close cannot be called while a render target is active in love.graphics.");
-
-		graphics->unSetMode();
-	}
-
-	if (glcontext)
-	{
-		SDL_GL_DeleteContext(glcontext);
-		glcontext = nullptr;
-	}
-
-#ifdef LOVE_GRAPHICS_METAL
-	if (metalView)
-	{
-		SDL_Metal_DestroyView(metalView);
-		metalView = nullptr;
-	}
-#endif
-
 	if (window)
 	{
 		SDL_DestroyWindow(window);
@@ -1708,18 +1723,21 @@ void *Window::getHandle() const
 void Window::getWind(void *&w, void *&g)
 {
 	w = window;
-	g = glcontext;
+	//g = glcontext;
 }
 
 void Window::setWind(void *nwindow, void *nglcontext)
 {
-	graphics->unSetMode();
+	//graphics->unSetMode();
 	window = (SDL_Window *)nwindow;
-	glcontext = (SDL_GLContext *)nglcontext;
+	//glcontext = (SDL_GLContext *)nglcontext;
 	open = window != nullptr;
-	double scaledw, scaledh;
-	fromPixels((double) pixelWidth, (double) pixelHeight, scaledw, scaledh);
-	graphics->setMode(glcontext, (int) scaledw, (int) scaledh, pixelWidth, pixelHeight, settings.stencil, settings.depth, settings.msaa);
+	if (open && glcontext) {
+		SDL_GL_MakeCurrent(window, glcontext);
+	}
+	//double scaledw, scaledh;
+	//fromPixels((double) pixelWidth, (double) pixelHeight, scaledw, scaledh);
+	//graphics->setMode(glcontext, (int) scaledw, (int) scaledh, pixelWidth, pixelHeight, settings.stencil, settings.depth, settings.msaa);
 }
 
 SDL_MessageBoxFlags Window::convertMessageBoxType(MessageBoxType type) const
